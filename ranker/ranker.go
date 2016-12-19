@@ -16,28 +16,26 @@ func NewRanker(ranking Ranking) *Ranker {
 }
 
 func (ranker *Ranker) AddItem(item string) error {
-	var baseIndex, middle int
+	var baseIndex, rankingLength, middle int
 	var comparativeItem string
 
-	ranking := make([]string, len(ranker.Ranking))
-
-	copy(ranking, ranker.Ranking)
+	rankingLength = len(ranker.Ranking)
 	baseIndex = 0
 
 	for {
-		middle = len(ranking) / 2
-		if len(ranking) == 0 {
+		middle = rankingLength / 2
+		if rankingLength == 0 {
 			break
 		}
 
-		comparativeItem = ranking[middle]
+		comparativeItem = ranker.Ranking[baseIndex+middle]
 
 		isHigher := func() {
-			ranking = ranking[:middle]
+			rankingLength -= rankingLength - middle
 		}
 
 		isLower := func() {
-			ranking = ranking[middle+1:]
+			rankingLength -= middle + 1
 			baseIndex += middle + 1
 		}
 
