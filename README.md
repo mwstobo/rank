@@ -1,4 +1,4 @@
-# Rank
+# rank
 Rank things by comparing them to other things. Inspired by `git bisect`.
 
 ## Quick Start
@@ -30,3 +30,4 @@ What do you want to do?
 ## Future
 * List formatting
 * Range insertion
+* Better data structure
