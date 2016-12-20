@@ -2,26 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/mwstobo/rank/interactive"
+	"github.com/mwstobo/rank/config"
 	"github.com/mwstobo/rank/ranker"
 	"github.com/mwstobo/rank/store"
+	"github.com/mwstobo/rank/ui"
 	"os"
 )
 
 func main() {
-	var filename, command string
-	switch len(os.Args) {
-	case 3:
-		command = os.Args[2]
-		fallthrough
-	case 2:
-		filename = os.Args[1]
-	default:
-		usage()
+	err := config.ParseConfig()
+	if err == config.Help {
+		os.Exit(0)
+	} else if err != nil {
+		fmt.Printf("Error parsing config: %v\n", err)
+		os.Exit(1)
 	}
 
-	storage := store.NewJsonStorage(filename)
-
+	storage := store.NewJsonStorage(config.Filename)
 	ranking, err := storage.Import()
 	if err != nil {
 		fmt.Printf("Error importing ranking file: %v\n", err)
@@ -30,15 +27,21 @@ func main() {
 
 	ranker := ranker.NewRanker(ranking)
 
-	if command == "" {
-		app := interactive.NewInteractiveApp(ranker, storage)
+	if config.Ui == config.INTERACTIVE {
+		app := ui.NewInteractiveApp(ranker, storage)
 		app.Run()
 	} else {
-		fmt.Printf("Command: %s\n", command)
+		app := ui.NewCliApp(ranker, storage)
+		switch config.Command {
+		case config.ADD_COMMAND:
+			app.AddAction(config.AddItem)
+		case config.LIST_COMMAND:
+			app.ListAction()
+		case config.DELETE_COMMAND:
+			app.DeleteAction(config.DeleteItemNumber)
+		default:
+			fmt.Printf("Config has bad command %s!", config.Command)
+		}
+		app.SaveAction()
 	}
-}
-
-func usage() {
-	fmt.Println("Invalid input!")
-	os.Exit(1)
 }

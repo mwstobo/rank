@@ -1,4 +1,4 @@
-package interactive
+package ui
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func NewInteractiveApp(
 	}
 }
 
-func (app *InteractiveApp) Run() error {
+func (app *InteractiveApp) Run() {
 	choices := []util.Choice{
 		util.Choice{"Add an item", "1", app.AddAction},
 		util.Choice{"View your list", "2", app.ListAction},
@@ -36,7 +36,7 @@ func (app *InteractiveApp) Run() error {
 	for {
 		select {
 		case <-app.quit:
-			return nil
+			return
 		default:
 			selectedChoice, err := util.VerbosePresentChoice(
 				"What do you want to do?",
@@ -45,7 +45,9 @@ func (app *InteractiveApp) Run() error {
 				app.SaveAndQuitAction()
 				continue
 			} else if err != nil {
-				return err
+				fmt.Printf("Error reading choice: %v\n", err)
+				app.SaveAndQuitAction()
+				continue
 			}
 			selectedChoice()
 			fmt.Println("")
