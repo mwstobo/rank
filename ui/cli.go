@@ -34,7 +34,7 @@ func (app *CliApp) ListAction() {
 }
 
 func (app *CliApp) DeleteAction(itemNumber int) {
-	if len(app.ranker.Ranking) == 0 {
+	if app.ranker.Ranking.Length() == 0 {
 		fmt.Println("No items")
 		return
 	}

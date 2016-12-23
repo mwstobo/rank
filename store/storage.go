@@ -1,10 +1,10 @@
 package store
 
 import (
-	"github.com/mwstobo/rank/ranker"
+	"github.com/mwstobo/rank/rankings"
 )
 
 type Storage interface {
-	Import() (ranker.Ranking, error)
-	Export(ranker.Ranking) error
+	Import() (map[int]string, error)
+	Export(rankings.Ranking) error
 }

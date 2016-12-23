@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/mwstobo/rank/config"
 	"github.com/mwstobo/rank/ranker"
+	"github.com/mwstobo/rank/rankings"
 	"github.com/mwstobo/rank/store"
 	"github.com/mwstobo/rank/ui"
 	"os"
@@ -19,12 +20,13 @@ func main() {
 	}
 
 	storage := store.NewJsonStorage(config.Filename)
-	ranking, err := storage.Import()
+	rankingMap, err := storage.Import()
 	if err != nil {
 		fmt.Printf("Error importing ranking file: %v\n", err)
 		os.Exit(1)
 	}
 
+	ranking := rankings.NewArrayRanking(rankingMap)
 	ranker := ranker.NewRanker(ranking)
 
 	if config.Ui == config.INTERACTIVE {

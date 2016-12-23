@@ -2,13 +2,13 @@ package store
 
 import (
 	"encoding/json"
-	"github.com/mwstobo/rank/ranker"
+	"github.com/mwstobo/rank/rankings"
 	"io/ioutil"
 	"os"
 )
 
 type RankingJson struct {
-	Ranking ranker.Ranking `json:"ranking"`
+	Ranking map[int]string `json:"ranking"`
 }
 
 type JsonStorage struct {
@@ -21,10 +21,10 @@ func NewJsonStorage(filename string) *JsonStorage {
 	}
 }
 
-func (storage *JsonStorage) Import() (ranker.Ranking, error) {
+func (storage *JsonStorage) Import() (map[int]string, error) {
 	rankingData, err := ioutil.ReadFile(storage.filename)
 	if os.IsNotExist(err) {
-		return ranker.Ranking{}, nil
+		return make(map[int]string), nil
 	} else if err != nil {
 		return nil, err
 	}
@@ -36,13 +36,18 @@ func (storage *JsonStorage) Import() (ranker.Ranking, error) {
 	}
 
 	if rankingJson.Ranking == nil {
-		return ranker.Ranking{}, nil
+		return make(map[int]string), nil
 	}
 	return rankingJson.Ranking, nil
 }
 
-func (storage *JsonStorage) Export(ranking ranker.Ranking) error {
-	rankingJson := RankingJson{ranking}
+func (storage *JsonStorage) Export(ranking rankings.Ranking) error {
+	rankingJson := &RankingJson{}
+	rankingJson.Ranking = make(map[int]string)
+	for i := 0; i < ranking.Length(); i += 1 {
+		rankingJson.Ranking[i] = ranking.Select(i)
+	}
+
 	rankingData, err := json.Marshal(rankingJson)
 	rankingData = append(rankingData, '\n')
 	if err != nil {

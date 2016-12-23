@@ -2,14 +2,15 @@ package ranker
 
 import (
 	"fmt"
+	"github.com/mwstobo/rank/rankings"
 	"github.com/mwstobo/rank/util"
 )
 
 type Ranker struct {
-	Ranking Ranking
+	Ranking rankings.Ranking
 }
 
-func NewRanker(ranking Ranking) *Ranker {
+func NewRanker(ranking rankings.Ranking) *Ranker {
 	return &Ranker{
 		Ranking: ranking,
 	}
@@ -19,7 +20,7 @@ func (ranker *Ranker) AddItem(item string) error {
 	var baseIndex, rankingLength, middle int
 	var comparativeItem string
 
-	rankingLength = len(ranker.Ranking)
+	rankingLength = ranker.Ranking.Length()
 	baseIndex = 0
 
 	for {
@@ -28,7 +29,7 @@ func (ranker *Ranker) AddItem(item string) error {
 			break
 		}
 
-		comparativeItem = ranker.Ranking[baseIndex+middle]
+		comparativeItem = ranker.Ranking.Select(baseIndex + middle)
 
 		isHigher := func() {
 			rankingLength -= rankingLength - middle
@@ -54,26 +55,23 @@ func (ranker *Ranker) AddItem(item string) error {
 	}
 
 	insertIndex := baseIndex + middle
-	ranker.Ranking = append(ranker.Ranking, "")
-	copy(ranker.Ranking[insertIndex+1:], ranker.Ranking[insertIndex:])
-	ranker.Ranking[insertIndex] = item
+	ranker.Ranking.Insert(insertIndex, item)
 
 	return nil
 }
 
 func (ranker *Ranker) ListItems() {
-	if len(ranker.Ranking) == 0 {
+	if ranker.Ranking.Length() == 0 {
 		fmt.Println("No items")
 		return
 	}
 
-	for position, item := range ranker.Ranking {
-		fmt.Printf("%d. %s\n", position+1, item)
+	for i := 0; i < ranker.Ranking.Length(); i += 1 {
+		item := ranker.Ranking.Select(i)
+		fmt.Printf("%d. %s\n", i+1, item)
 	}
 }
 
 func (ranker *Ranker) DeleteItem(itemIndex int) {
-	ranker.Ranking = append(
-		ranker.Ranking[:itemIndex],
-		ranker.Ranking[itemIndex+1:]...)
+	ranker.Ranking.Delete(itemIndex)
 }

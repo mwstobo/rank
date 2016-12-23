@@ -79,7 +79,7 @@ func (app *InteractiveApp) DeleteAction() {
 	var itemNumber int
 	var err error
 
-	if len(app.ranker.Ranking) == 0 {
+	if app.ranker.Ranking.Length() == 0 {
 		fmt.Println("No items")
 		return
 	}
@@ -93,7 +93,7 @@ func (app *InteractiveApp) DeleteAction() {
 			return
 		}
 
-		if itemNumber > 0 && itemNumber <= len(app.ranker.Ranking) {
+		if itemNumber > 0 && itemNumber <= app.ranker.Ranking.Length() {
 			break
 		}
 		fmt.Printf("Invalid item number %d\n", itemNumber)
