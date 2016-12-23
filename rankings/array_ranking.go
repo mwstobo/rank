@@ -4,14 +4,9 @@ type ArrayRanking struct {
 	array []string
 }
 
-func NewArrayRanking(rankingMap map[int]string) *ArrayRanking {
-	array := make([]string, len(rankingMap))
-	for _, item := range rankingMap {
-		array = append(array, item)
-	}
-
+func NewArrayRanking(rankingSlice []string) Ranking {
 	return &ArrayRanking{
-		array: array,
+		array: rankingSlice,
 	}
 }
 

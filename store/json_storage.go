@@ -8,7 +8,7 @@ import (
 )
 
 type RankingJson struct {
-	Ranking map[int]string `json:"ranking"`
+	Ranking []string `json:"ranking"`
 }
 
 type JsonStorage struct {
@@ -21,10 +21,10 @@ func NewJsonStorage(filename string) *JsonStorage {
 	}
 }
 
-func (storage *JsonStorage) Import() (map[int]string, error) {
+func (storage *JsonStorage) Import() ([]string, error) {
 	rankingData, err := ioutil.ReadFile(storage.filename)
 	if os.IsNotExist(err) {
-		return make(map[int]string), nil
+		return make([]string, 0), nil
 	} else if err != nil {
 		return nil, err
 	}
@@ -36,14 +36,14 @@ func (storage *JsonStorage) Import() (map[int]string, error) {
 	}
 
 	if rankingJson.Ranking == nil {
-		return make(map[int]string), nil
+		return make([]string, 0), nil
 	}
 	return rankingJson.Ranking, nil
 }
 
 func (storage *JsonStorage) Export(ranking rankings.Ranking) error {
 	rankingJson := &RankingJson{}
-	rankingJson.Ranking = make(map[int]string)
+	rankingJson.Ranking = make([]string, ranking.Length())
 	for i := 0; i < ranking.Length(); i += 1 {
 		rankingJson.Ranking[i] = ranking.Select(i)
 	}

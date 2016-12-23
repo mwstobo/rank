@@ -5,6 +5,6 @@ import (
 )
 
 type Storage interface {
-	Import() (map[int]string, error)
+	Import() ([]string, error)
 	Export(rankings.Ranking) error
 }

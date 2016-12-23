@@ -20,13 +20,13 @@ func main() {
 	}
 
 	storage := store.NewJsonStorage(config.Filename)
-	rankingMap, err := storage.Import()
+	rankingSlice, err := storage.Import()
 	if err != nil {
 		fmt.Printf("Error importing ranking file: %v\n", err)
 		os.Exit(1)
 	}
 
-	ranking := rankings.NewArrayRanking(rankingMap)
+	ranking := rankings.NewArrayRanking(rankingSlice)
 	ranker := ranker.NewRanker(ranking)
 
 	if config.Ui == config.INTERACTIVE {
