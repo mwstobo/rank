@@ -4,7 +4,7 @@ build:
 	go build
 
 test:
-	go test ./...
+	go test -tags mocks ./...
 
 clean:
 	go clean

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/mwstobo/rank/config"
+	"github.com/mwstobo/rank/input"
 	"github.com/mwstobo/rank/ranker"
 	"github.com/mwstobo/rank/rankings"
 	"github.com/mwstobo/rank/store"
@@ -26,11 +27,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	stdinInput := input.NewStdinUserInput()
+
 	ranking := rankings.NewArrayRanking(rankingSlice)
-	ranker := ranker.NewRanker(ranking)
+	ranker := ranker.NewRanker(ranking, stdinInput)
 
 	if config.Ui == config.INTERACTIVE {
-		app := ui.NewInteractiveApp(ranker, storage)
+		app := ui.NewInteractiveApp(ranker, storage, stdinInput)
 		app.Run()
 	} else {
 		app := ui.NewCliApp(ranker, storage)

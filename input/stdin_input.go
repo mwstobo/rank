@@ -1,23 +1,20 @@
-package util
+package input
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type Choice struct {
-	Name    string
-	Command string
-	Action  func()
+type StdinUserInput struct{}
+
+func NewStdinUserInput() UserInput {
+	return &StdinUserInput{}
 }
 
-var EOF = errors.New("user closed stdin")
-
-func VerbosePresentChoice(
+func (userInput *StdinUserInput) VerbosePresentChoice(
 	prompt string,
 	choices []Choice) (func(), error) {
 
@@ -25,9 +22,9 @@ func VerbosePresentChoice(
 		fmt.Printf("%s) %s\n", choice.Command, choice.Name)
 	}
 
-	return PresentChoice(prompt, choices)
+	return userInput.PresentChoice(prompt, choices)
 }
-func PresentChoice(
+func (userInput *StdinUserInput) PresentChoice(
 	prompt string,
 	choices []Choice) (func(), error) {
 
@@ -63,7 +60,7 @@ func PresentChoice(
 	}
 }
 
-func GetInput(prompt string) (string, error) {
+func (userInput *StdinUserInput) GetInput(prompt string) (string, error) {
 	stdinScanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -82,8 +79,8 @@ func GetInput(prompt string) (string, error) {
 	}
 }
 
-func GetInputInt(prompt string) (int, error) {
-	text, err := GetInput(prompt)
+func (userInput *StdinUserInput) GetInputInt(prompt string) (int, error) {
+	text, err := userInput.GetInput(prompt)
 	if err != nil {
 		return 0, err
 	}

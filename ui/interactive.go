@@ -2,35 +2,38 @@ package ui
 
 import (
 	"fmt"
+	"github.com/mwstobo/rank/input"
 	"github.com/mwstobo/rank/ranker"
 	"github.com/mwstobo/rank/store"
-	"github.com/mwstobo/rank/util"
 )
 
 type InteractiveApp struct {
-	ranker  *ranker.Ranker
-	storage store.Storage
-	quit    chan bool
+	ranker    *ranker.Ranker
+	storage   store.Storage
+	userInput input.UserInput
+	quit      chan bool
 }
 
 func NewInteractiveApp(
 	ranker *ranker.Ranker,
-	storage store.Storage) *InteractiveApp {
+	storage store.Storage,
+	userInput input.UserInput) *InteractiveApp {
 
 	return &InteractiveApp{
-		ranker:  ranker,
-		storage: storage,
-		quit:    make(chan bool, 1),
+		ranker:    ranker,
+		storage:   storage,
+		userInput: userInput,
+		quit:      make(chan bool, 1),
 	}
 }
 
 func (app *InteractiveApp) Run() {
-	choices := []util.Choice{
-		util.Choice{"Add an item", "1", app.AddAction},
-		util.Choice{"View your list", "2", app.ListAction},
-		util.Choice{"Delete an item", "3", app.DeleteAction},
-		util.Choice{"Save and quit", "4", app.SaveAndQuitAction},
-		util.Choice{"Quit without saving", "5", app.QuitAction},
+	choices := []input.Choice{
+		input.Choice{"Add an item", "1", app.AddAction},
+		input.Choice{"View your list", "2", app.ListAction},
+		input.Choice{"Delete an item", "3", app.DeleteAction},
+		input.Choice{"Save and quit", "4", app.SaveAndQuitAction},
+		input.Choice{"Quit without saving", "5", app.QuitAction},
 	}
 
 	for {
@@ -38,10 +41,10 @@ func (app *InteractiveApp) Run() {
 		case <-app.quit:
 			return
 		default:
-			selectedChoice, err := util.VerbosePresentChoice(
+			selectedChoice, err := app.userInput.VerbosePresentChoice(
 				"What do you want to do?",
 				choices)
-			if err == util.EOF {
+			if err == input.EOF {
 				app.SaveAndQuitAction()
 				continue
 			} else if err != nil {
@@ -56,7 +59,7 @@ func (app *InteractiveApp) Run() {
 }
 
 func (app *InteractiveApp) AddAction() {
-	item, err := util.GetInput("What do you want to add?")
+	item, err := app.userInput.GetInput("What do you want to add?")
 	if err != nil {
 		fmt.Printf("Error reading input: %v\n", err)
 		app.SaveAndQuitAction()
@@ -86,7 +89,8 @@ func (app *InteractiveApp) DeleteAction() {
 
 	app.ListAction()
 	for {
-		itemNumber, err = util.GetInputInt("What do you want to delete?")
+		itemNumber, err = app.userInput.GetInputInt(
+			"What do you want to delete?")
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
 			app.SaveAndQuitAction()

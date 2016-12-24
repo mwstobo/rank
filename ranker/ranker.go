@@ -2,22 +2,24 @@ package ranker
 
 import (
 	"fmt"
+	"github.com/mwstobo/rank/input"
 	"github.com/mwstobo/rank/rankings"
-	"github.com/mwstobo/rank/util"
 )
 
 type Ranker struct {
-	Ranking rankings.Ranking
+	Ranking   rankings.Ranking
+	userInput input.UserInput
 }
 
-func NewRanker(ranking rankings.Ranking) *Ranker {
+func NewRanker(ranking rankings.Ranking, userInput input.UserInput) *Ranker {
 	return &Ranker{
-		Ranking: ranking,
+		Ranking:   ranking,
+		userInput: userInput,
 	}
 }
 
 func (ranker *Ranker) AddItem(item string) error {
-	var baseIndex, rankingLength, middle int
+	var baseIndex, comparativeIndex, rankingLength, middle int
 	var comparativeItem string
 
 	rankingLength = ranker.Ranking.Length()
@@ -25,11 +27,12 @@ func (ranker *Ranker) AddItem(item string) error {
 
 	for {
 		middle = rankingLength / 2
+		comparativeIndex = baseIndex + middle
 		if rankingLength == 0 {
 			break
 		}
 
-		comparativeItem = ranker.Ranking.Select(baseIndex + middle)
+		comparativeItem = ranker.Ranking.Select(comparativeIndex)
 
 		isHigher := func() {
 			rankingLength -= rankingLength - middle
@@ -40,12 +43,12 @@ func (ranker *Ranker) AddItem(item string) error {
 			baseIndex += middle + 1
 		}
 
-		choices := []util.Choice{
-			util.Choice{Command: "y", Action: isHigher},
-			util.Choice{Command: "n", Action: isLower},
+		choices := []input.Choice{
+			input.Choice{Command: "y", Action: isHigher},
+			input.Choice{Command: "n", Action: isLower},
 		}
 
-		selectedChoice, err := util.PresentChoice(
+		selectedChoice, err := ranker.userInput.PresentChoice(
 			fmt.Sprintf("Is %s higher than %s?", item, comparativeItem),
 			choices)
 		if err != nil {
@@ -54,9 +57,7 @@ func (ranker *Ranker) AddItem(item string) error {
 		selectedChoice()
 	}
 
-	insertIndex := baseIndex + middle
-	ranker.Ranking.Insert(insertIndex, item)
-
+	ranker.Ranking.Insert(comparativeIndex, item)
 	return nil
 }
 
