@@ -38,6 +38,10 @@ func (app *CliApp) DeleteAction(itemNumber int) {
 		fmt.Println("No items")
 		return
 	}
+	if itemNumber <= 0 || itemNumber > app.ranker.Ranking.Length() {
+		fmt.Printf("Invalid item number %d\n", itemNumber)
+		return
+	}
 
 	app.ranker.DeleteItem(itemNumber - 1)
 }
