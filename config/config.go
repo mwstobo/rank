@@ -33,7 +33,7 @@ func ParseConfig() error {
 
 	args := os.Args[1:]
 
-	if args[0] == "--help" || args[0] == "-h" {
+	if len(args) <= 0 || args[0] == "--help" || args[0] == "-h" {
 		Usage()
 		return Help
 	}
